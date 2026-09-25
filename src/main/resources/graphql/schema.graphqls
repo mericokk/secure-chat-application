@@ -1,0 +1,118 @@
+type User {
+  id: ID!
+  username: String!
+  publicKey: String
+}
+
+type ChatGroup {
+  id: ID!
+  name: String!
+  keyVersion: Int!
+  createdAt: String
+}
+
+type GroupMember {
+  id: ID!
+  groupId: ID!
+  userId: ID!
+  role: String!
+  joinedAt: String
+}
+
+type GroupKey {
+  id: ID!
+  groupId: ID!
+  userId: ID!
+  keyVersion: Int!
+  encryptedGroupKey: String!
+  iv: String!
+  senderPublicKey: String!
+}
+
+type Message {
+  id: ID!
+  senderId: ID!
+  senderName: String!
+  groupId: ID!
+  encryptedContent: String!
+  iv: String!
+  keyVersion: Int!
+  createdAt: String
+}
+
+type LoginResponse {
+  accessToken: String!
+  refreshToken: String!
+}
+
+input LoginInput {
+  username: String!
+  password: String!
+}
+
+input RegisterUserInput {
+  username: String!
+  password: String!
+  publicKey: String!
+}
+
+input UpdatePublicKeyInput {
+  publicKey: String!
+}
+
+input CreateGroupInput {
+  name: String!
+}
+
+input AddMemberInput {
+  groupId: ID!
+  username: String!
+}
+
+input RemoveMemberInput {
+  groupId: ID!
+  username: String!
+}
+
+input SaveGroupKeyInput {
+    groupId: ID!
+    userId: ID
+    keyVersion: Int!
+    encryptedGroupKey: String!
+    iv: String!
+    senderPublicKey: String!
+}
+
+input SendMessageInput {
+  groupId: ID!
+  encryptedContent: String!
+  iv: String!
+  keyVersion: Int!
+}
+
+type Query {
+  getUser(username: String!): User
+  getAllGroups: [ChatGroup!]!
+  getGroupMembers(groupId: ID!): [User!]!
+  getGroupKeyForUser(groupId: ID!, keyVersion: Int): GroupKey
+  getGroupKeyVersion(groupId: ID!): Int
+  getGroupChatHistory(groupId: ID!): [Message!]!
+  getMyGroupMembership(groupId: ID!): GroupMember
+}
+
+type Mutation {
+  login(input: LoginInput!): LoginResponse!
+  registerUser(input: RegisterUserInput!): User!
+  updatePublicKey(input: UpdatePublicKeyInput!): User!
+  createGroup(input: CreateGroupInput!): ChatGroup!
+  addGroupMember(input: AddMemberInput!): GroupMember!
+  removeGroupMember(input: RemoveMemberInput!): Boolean!
+  saveGroupKey(input: SaveGroupKeyInput!): GroupKey!
+  sendMessage(input: SendMessageInput!): Message!
+  rotateGroupKey(groupId: ID!): Int!
+}
+
+type Subscription {
+  messageAdded(groupId: ID!): Message!
+  groupMemberAdded: GroupMember!
+}
